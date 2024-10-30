@@ -4,12 +4,14 @@ import styles from './NavBar.module.scss';
 import { clearLocalStorage } from '../../utils/utils';
 import { useUser } from '../../context/UserContext';
 import { useFavorite } from '../../context/FavoriteContext';
+import { toast } from 'react-toastify';
 
 
 const Navbar = () => {
     const navigate = useNavigate();
     const { user, clearUser } = useUser();
     const { favorites } = useFavorite();
+    
     return (
         // TODO fix order, so that container is INSIDE in navbar, not other way around. same for rest. sot html source is readable
         <div className="container"> 
@@ -23,15 +25,21 @@ const Navbar = () => {
                     <NavLink to="/services" className={({ isActive }) => isActive ? "active" : ""}>Services</NavLink>
                     <NavLink to="/about" className={({ isActive }) => isActive ? "active" : ""}>About</NavLink>
                     <NavLink to="/contact" className={({ isActive }) => isActive ? "active" : ""}>Contact</NavLink>
-                    <NavLink to="/favorites" className={({ isActive }) => isActive ? "active" : ""}>Favorites ({favorites.length})</NavLink>
+                    {user && <NavLink to="/favorites" className={({ isActive }) => isActive ? "active" : ""}>Favorites ({favorites.length})</NavLink>}
                 </div>
             </div>
             <div className={styles.right}>
                 
                 {user ? (
                     <>
-                        <p>Welcome, {user.username}!</p>
-                        <button onClick={clearUser}>Logout</button>
+                        <div className={styles.links}>
+                            <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>{user.username} Dashboard!</NavLink>
+                        </div>
+                        <button onClick={() => {
+                            clearUser();
+                            toast.success(`Logged out successfully, bye ${user.username}!`);
+                            navigate('/');
+                        }}>Logout</button>
                     </>
                 ) : <button onClick={() => navigate('/login')}>Login/Signup</button>}
 
